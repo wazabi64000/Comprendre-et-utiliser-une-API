@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="fr">
 <head>
@@ -238,6 +237,118 @@ form.addEventListener('submit', async e =&gt; {
       <li>Ce modèle peut être réutilisé pour d’autres APIs similaires.</li>
     </ul>
   </div>
+  <!-- SECTION 6 : Exemple Express + Twig (Node.js) -->
+<h2> Exemple Express + Twig (Node.js)</h2>
+<p>
+  Cet exemple montre comment créer un petit serveur web avec Node.js, Express (ESM) et le moteur de template Twig.  
+  L’objectif : afficher une page web et utiliser un template Twig pour générer du HTML dynamique.
+</p>
+
+<div class="example">
+  <pre><code>
+import express from "express";
+import fetch from "node-fetch"; // nécessaire pour Node < 18
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+
+const app = express();
+const port = 3000;
+
+// Configurer Twig
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+app.set("views", join(__dirname, "views"));
+app.set("view engine", "twig");
+
+// Route principale
+app.get("/", async (req, res) => {
+  try {
+    // Requête à TVMaze pour une recherche exemple "Friends"
+    const response = await fetch("https://api.tvmaze.com/search/shows?q=maruko");
+    const data = await response.json();
+
+    // Transformation des données pour Twig
+    const series = data.map(item => {
+      return {
+        name: item.show.name,
+        genre: item.show.genres.join(", ") || "Non précisé",
+        year: item.show.premiered ? item.show.premiered.split("-")[0] : "Inconnue",
+        image: item.show.image ? item.show.image.medium : "https://via.placeholder.com/200x250?text=Aucune+image"
+      };
+    });
+
+    res.render("index", { series });
+
+  } catch (err) {
+    console.error(err);
+    res.send("Erreur lors de la récupération des séries depuis TVMaze");
+  }
+});
+
+app.listen(port, () => {
+  console.log(`Serveur démarré sur http://localhost:${port}`);
+});
+
+/*
+6. Fichier views/index.twig :
+--------------------------------
+ 
+&lt;!DOCTYPE html&gt;
+&lt;html lang="fr"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Liste des séries&lt;/title&gt;
+  &lt;style&gt;
+    body { font-family: Arial; background: #f4f6f9; margin: 0; padding: 20px; }
+    h1 { color: #2b8aef; text-align: center; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
+    .card { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 3px 8px rgba(0,0,0,0.1); transition: transform 0.2s; }
+    .card:hover { transform: translateY(-5px); }
+    .card img { width: 100%; height: 250px; object-fit: cover; }
+    .card-content { padding: 10px; }
+    .card-content h3 { margin: 0 0 5px 0; font-size: 18px; color: #2b8aef; }
+    .card-content p { margin: 0; font-size: 14px; color: #555; }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+  &lt;h1&gt;Liste des séries&lt;/h1&gt;
+
+  &lt;div class="grid"&gt;
+    {% for show in series %}
+      &lt;div class="card"&gt;
+        &lt;img src="{{ show.image }}" alt="{{ show.name }}"&gt;
+        &lt;div class="card-content"&gt;
+          &lt;h3&gt;{{ show.name }}&lt;/h3&gt;
+          &lt;p&gt;Genres : {{ show.genre }}&lt;/p&gt;
+          &lt;p&gt;Année : {{ show.year }}&lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    {% endfor %}
+  &lt;/div&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+
+*/
+  </code></pre>
+</div>
+
+<div class="explanation">
+  <p><strong>Explications ligne par ligne :</strong></p>
+  <ul>
+    <li><strong>import express:</strong> on utilise la syntaxe ESM pour importer Express.</li>
+    <li><strong>fileURLToPath / dirname:</strong> permet de retrouver le chemin actuel pour configurer les templates.</li>
+    <li><strong>app.set("views"):</strong> indique à Express où se trouvent les templates Twig.</li>
+    <li><strong>app.set("view engine"):</strong> définit Twig comme moteur de rendu HTML.</li>
+    <li><strong>app.get("/"): </strong> crée la route principale qui renvoie une page HTML générée par Twig.</li>
+    <li><strong>res.render("index", { series }): </strong> envoie les données au template Twig pour qu’il génère le HTML dynamique.</li>
+    <li><strong>server.listen(port):</strong> démarre le serveur Node.js sur le port 3000.</li>
+    <li><strong>index.twig:</strong> le template Twig utilise une boucle <code>{% for %}</code> pour afficher toutes les séries.</li>
+  </ul>
+  <p>Ce modèle est facilement réutilisable pour afficher des données d’une API ou d’une base de données dans vos pages web.</p>
+</div>
+
 
 </main>
 
@@ -289,6 +400,11 @@ form.addEventListener('submit', async e =&gt; {
     }
   });
 </script>
+
+
+
+
+
 
 </body>
 </html>
