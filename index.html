@@ -1,1 +1,294 @@
 
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Cours : Comprendre et utiliser une API</title>
+  <style>
+    /* Styles généraux */
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      line-height: 1.7;
+      margin: 0;
+      padding: 0;
+      background: #f4f6f9;
+      color: #222;
+    }
+
+    header {
+      background: #2b8aef;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    }
+
+    h1, h2, h3 {
+      color: #2b8aef;
+    }
+
+    code {
+      background: #eee;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    pre {
+      background: #f0f0f0;
+      padding: 10px;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+
+    /* Styles pour les exemples */
+    .example {
+      border-left: 4px solid #2b8aef;
+      padding: 12px;
+      margin: 20px 0;
+      background: #fafafa;
+      border-radius: 6px;
+    }
+
+    .explanation {
+      background: #eef4fc;
+      border-left: 4px solid #2b8aef;
+      padding: 10px;
+      margin: 10px 0 20px 0;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    /* Styles pour les formulaires et boutons */
+    form {
+      margin-top: 10px;
+    }
+
+    input, button {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 15px;
+    }
+
+    input {
+      width: 60%;
+      margin-right: 10px;
+    }
+
+    button {
+      background: #2b8aef;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #1f6fc1;
+    }
+
+    /* Styles pour les cartes de résultats */
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 15px 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .card img {
+      max-width: 100px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Cours : Comprendre et utiliser une API</h1>
+</header>
+
+<main>
+  <!-- SECTION 1 : Théorie -->
+  <h2>1. Qu’est-ce qu’une API ?</h2>
+  <p>
+    Une API (Application Programming Interface) est un service qui permet à un programme ou une page web 
+    d’obtenir des informations depuis une autre application.  
+    Exemple simple : un restaurant. Tu passes ta commande (requête) et tu reçois ton plat (réponse).
+  </p>
+  <p>
+    Les APIs sur Internet utilisent souvent le format <strong>JSON</strong>, qui est une structure de données organisée, facile à lire par un programme.
+  </p>
+
+  <h2>2. Où trouver des APIs ?</h2>
+  <ul>
+    <li><strong>Documentation officielle :</strong> chaque API fournit des instructions pour l’utiliser. Exemple : <a href="https://www.tvmaze.com/api" target="_blank">TVMaze</a>.</li>
+    <li><strong>Annuaires d’APIs :</strong> <a href="https://github.com/public-apis/public-apis" target="_blank">Public APIs</a>, <a href="https://rapidapi.com/" target="_blank">RapidAPI</a>.</li>
+    <li>Vérifie si l’API est <strong>libre</strong> (pas besoin de clé) ou si elle nécessite une <strong>clé API</strong>.</li>
+  </ul>
+
+  <h2>3. Bonnes pratiques pour utiliser une API</h2>
+  <ul>
+    <li>Lire la documentation pour connaître les paramètres, limites et format des données.</li>
+    <li>Ne jamais exposer une clé API côté client si elle est nécessaire.</li>
+    <li>Tester vos requêtes avant de coder (navigateur ou Postman).</li>
+    <li>Prévoir des messages clairs si une erreur survient ou si aucun résultat n’est trouvé.</li>
+    <li>Respecter les limites d’utilisation (nombre de requêtes par minute/jour).</li>
+  </ul>
+
+  <!-- SECTION 2 : Exemple API Météo -->
+  <h2>4. Exemple pratique : API météo</h2>
+  <p>Nous allons utiliser l’API Open Meteo pour récupérer la température actuelle à Paris :</p>
+
+  <div class="example">
+    <button onclick="getWeather()">Voir la température actuelle à Paris</button>
+    <p id="weatherResult"></p>
+  </div>
+
+  <div class="explanation">
+    <p><strong>Explication simplifiée :</strong></p>
+    <ul>
+      <li>On utilise <code>fetch()</code> pour demander les données à l’API.</li>
+      <li>Les données reviennent au format JSON.</li>
+      <li>On affiche la température dans la page sans recharger.</li>
+    </ul>
+  </div>
+
+  <!-- SECTION 3 : Exemple API TVMaze -->
+  <h2>5. Exemple pratique : rechercher des séries avec TVMaze</h2>
+  <p>Nous allons permettre à l’utilisateur de rechercher des séries par leur titre :</p>
+
+  <!-- Formulaire de recherche -->
+  <form id="searchForm">
+    <input type="text" id="q" placeholder="Exemple : Friends, Naruto, The Office">
+    <button type="submit">Rechercher</button>
+  </form>
+
+  <!-- Zone d’affichage des résultats -->
+  <div id="results"></div>
+
+  <div class="example">
+    <pre><code>
+/* 1. Récupération des éléments HTML */
+const form = document.getElementById('searchForm');
+const input = document.getElementById('q');
+const results = document.getElementById('results');
+
+/* 2. Écoute de l'événement submit du formulaire */
+form.addEventListener('submit', async e =&gt; {
+  e.preventDefault(); // empêche le rechargement de la page
+  const query = input.value.trim(); // récupère le texte tapé
+  if (!query) return; // si vide, ne rien faire
+
+  results.innerHTML = "&lt;p&gt;Recherche en cours...&lt;/p&gt;";
+
+  try {
+    /* 3. Appel de l’API TVMaze */
+    const res = await fetch(`https://api.tvmaze.com/search/shows?q=${encodeURIComponent(query)}`);
+    const data = await res.json(); // conversion JSON
+
+    results.innerHTML = ""; // vider les anciens résultats
+
+    /* 4. Boucle sur les résultats et création des cartes */
+    data.forEach(item =&gt; {
+      const show = item.show;
+      const div = document.createElement('div');
+      div.className = "card";
+      div.innerHTML = `
+        &lt;img src="${show.image ? show.image.medium : 'https://via.placeholder.com/100?text=Aucune+image'}" alt="${show.name}"&gt;
+        &lt;div&gt;
+          &lt;strong&gt;${show.name}&lt;/strong&gt;&lt;br&gt;
+          Genres : ${show.genres.join(", ") || "Non précisé"}&lt;br&gt;
+          Première diffusion : ${show.premiered || "Inconnue"}
+        &lt;/div&gt;
+      `;
+      results.appendChild(div);
+    });
+
+  } catch (err) {
+    results.innerHTML = "&lt;p&gt;Erreur lors de la récupération des données.&lt;/p&gt;";
+    console.error(err); // afficher l'erreur dans la console
+  }
+});
+    </code></pre>
+  </div>
+
+  <div class="explanation">
+    <p><strong>Explication simplifiée :</strong></p>
+    <ul>
+      <li>On récupère le formulaire, le champ texte et la zone de résultats.</li>
+      <li>Lorsqu’on appuie sur le bouton ou Enter, la fonction se déclenche.</li>
+      <li>On empêche le rechargement automatique avec <code>e.preventDefault()</code>.</li>
+      <li>On récupère la valeur tapée, et si elle est vide, on ne fait rien.</li>
+      <li>On envoie la requête à l’API TVMaze et on récupère les résultats JSON.</li>
+      <li>Pour chaque série, on crée une carte affichant image, titre, genres et date.</li>
+      <li>Si une erreur survient, on affiche un message et on log l’erreur dans la console.</li>
+      <li>Ce modèle peut être réutilisé pour d’autres APIs similaires.</li>
+    </ul>
+  </div>
+
+</main>
+
+<script>
+  /* --- Fonction pour l’API météo --- */
+  async function getWeather() {
+    const url = "https://api.open-meteo.com/v1/forecast?latitude=48.85&longitude=2.35&current_weather=true";
+    const res = await fetch(url); // on demande les données
+    const data = await res.json(); // conversion JSON
+    document.getElementById("weatherResult").innerText =
+      "Température actuelle à Paris : " + data.current_weather.temperature + "°C";
+  }
+
+  /* --- Fonction pour l’API TVMaze --- */
+  const form = document.getElementById('searchForm');
+  const input = document.getElementById('q');
+  const results = document.getElementById('results');
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const query = input.value.trim();
+    if (!query) return;
+
+    results.innerHTML = "<p>Recherche en cours...</p>";
+
+    try {
+      const res = await fetch(`https://api.tvmaze.com/search/shows?q=${encodeURIComponent(query)}`);
+      const data = await res.json();
+
+      results.innerHTML = "";
+      data.forEach(item => {
+        const show = item.show;
+        const div = document.createElement('div');
+        div.className = "card";
+        div.innerHTML = `
+          <img src="${show.image ? show.image.medium : 'https://via.placeholder.com/100?text=Aucune+image'}" alt="${show.name}">
+          <div>
+            <strong>${show.name}</strong><br>
+            Genres : ${show.genres.join(", ") || "Non précisé"}<br>
+            Première diffusion : ${show.premiered || "Inconnue"}
+          </div>
+        `;
+        results.appendChild(div);
+      });
+
+    } catch (err) {
+      results.innerHTML = "<p>Erreur lors de la récupération des données.</p>";
+      console.error(err);
+    }
+  });
+</script>
+
+</body>
+</html>
